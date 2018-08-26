@@ -1,0 +1,37 @@
+894. All Possible Full Binary Trees
+//µ›πÈ«ÛΩ‚
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<TreeNode*> allPossibleFBT(int N) {
+        if( N % 2 == 0 ) return vector<TreeNode*> () ;
+        vector<TreeNode*> res ;
+        TreeNode* cur = new TreeNode(0) ;
+        if( N == 1 ) return  vector<TreeNode*> (1,cur) ;
+        delete cur ;
+        for( int i = 1 ; i < N ; i += 2 )
+        {
+            int j = N - 1 - i ;
+            vector<TreeNode*> left , right ;
+            left = allPossibleFBT( i ) ;
+            right = allPossibleFBT( j ) ;
+            for( int a = 0 ; a < left.size() ; a++ )
+                for( int b = 0 ; b < right.size() ; b++ )
+                {
+                    cur = new TreeNode(0) ;
+                    cur->left = left[a] ;
+                    cur->right = right[b] ;
+                    res.push_back(cur) ;
+                }
+        }
+        return res ;
+    }
+};
