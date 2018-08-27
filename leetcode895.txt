@@ -1,0 +1,79 @@
+895. Maximum Frequency Stack
+//堆排序+hash ： 296ms
+class FreqStack {
+public:
+    struct Node
+    {
+        int key ;
+        int count ;
+        vector<int> local ;
+        bool operator > ( struct Node& node )
+        {
+            if( this->count > node.count ) return 1 ;
+            if( this->count < node.count ) return 0 ;
+            if( this->local.back() > node.local.back() ) return 1 ;
+            return 0 ;
+        };
+    } ;
+    unordered_map<int,int> Hash ;//值：位置
+    vector<Node> heap ;//最大堆
+    int num ;
+    void heap_adjust(int i) 
+    {
+        if( i < 0 || i >= heap.size() ) return ;
+        int key = heap[i].key , count = heap[i].count ;
+        int left , right ;
+        left = 2 * i + 1 , right = 2 * i + 2 ;
+        int temp = i ;
+        if( left < heap.size() && heap[left] > heap[temp] ) temp = left ;
+        if( right < heap.size() && heap[right]> heap[temp] ) temp = right ;
+        if( i == temp ) return ;
+        Hash[key] = temp ;
+        Hash[heap[temp].key] = i ;
+        Node x = heap[i] ;
+        heap[i] = heap[temp] ;
+        heap[temp] = x ;
+        heap_adjust(temp) ;
+    };
+    
+    FreqStack() :
+    num(0)
+    {
+        
+    }
+    
+    void push(int x) {
+        if( Hash.find(x) == Hash.end() )
+        {
+            Node cur ;
+            cur.key = x , cur.count = 0 ;
+            heap.push_back(cur) ;
+            Hash[x] = heap.size()-1 ;
+        }
+        int i = Hash[x] ;
+        heap[i].count += 1 ;
+        heap[i].local.push_back(num) ;
+        while(i)
+        {
+            i = ( i - 1 ) / 2 ;
+            heap_adjust( i ) ;
+        }
+        num++ ;
+    }
+    
+    int pop() {
+        int i = 0 ;
+        heap[i].count -= 1 ;
+        int res = heap[i].key ;
+        heap[i].local.pop_back() ;
+        if( heap[i].count == 0 )
+        {
+            Hash[heap.back().key] = i ;
+            heap[i] = heap.back() ;
+            heap.pop_back() ;
+            Hash.erase(res) ;
+        }
+        heap_adjust( 0 ) ;
+        return res ;
+    }
+};
